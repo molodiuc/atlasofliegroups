@@ -68,7 +68,7 @@
 %token <id_code> IDENT TYPE_ID
 %token TOFILE ADDTOFILE FROMFILE FORCEFROMFILE
 
-%token <type_code> TYPE
+%token <type_code> PRIMTYPE
 %token ARROW "->"
 %token BECOMES ":="
 %token TLSUB "~["
@@ -102,8 +102,8 @@
 %destructor { destroy_pattern($$); } pat_list
 %type <type_pt> nostar_type type
 %destructor { destroy_type($$); } nostar_type type
-%type <type_l> types types_opt
-%destructor { destroy_type_list($$); } types types_opt
+%type <type_l> types union_list union_list_opt
+%destructor { destroy_type_list($$); } types union_list union_list_opt
 %type <id_sp1> id_spec struct_spec struct_field
 %destructor { destroy_type($$.type_pt);destroy_id_pat($$.ip);
             } id_spec struct_spec struct_field
@@ -560,23 +560,30 @@ struct_field : type IDENT { $$.type_pt=$1; $$.ip.kind=0x1; $$.ip.name=$2; }
 	| type '.'{ $$.type_pt=$1; $$.ip.kind=0x0; }
 ;
 
-nostar_type : TYPE	{ $$=make_prim_type($1); }
+nostar_type : PRIMTYPE	{ $$=make_prim_type($1); }
 	| TYPE_ID
 	  { bool c; $$=acquire(global_id_table->type_of($1,c)).release(); }
-        | '(' type ')'	{ $$=$2; }
-	| '(' type ARROW type ')' { $$=make_function_type($2,$4); }
-	| '(' types_opt ARROW type ')'
-			{ $$=make_function_type(make_tuple_type($2),$4); }
-	| '(' type ARROW types_opt ')'
-			{ $$=make_function_type($2,make_tuple_type($4)); }
-	| '(' types_opt ARROW types_opt ')'
-	   { $$=make_function_type(make_tuple_type($2),make_tuple_type($4)); }
-	| '[' type ']'	{ $$=make_row_type($2); }
-	| '(' types ')'	{ $$=make_tuple_type($2); }
+| '[' union_list ']'	{ $$=make_row_type(make_union_type($2)); }
+	| '(' union_list ')'	{ $$=make_union_type($2); }
+	| '(' union_list_opt ARROW union_list_opt ')'
+	  { $$=make_function_type(make_union_type($2),make_union_type($4)); }
 ;
 
 type : nostar_type
 	| '*' { $$=new type_expr;}
+;
+
+union_list_opt :   { $$=make_type_singleton(make_tuple_type(nullptr)); }
+	| union_list
+;
+
+union_list : type { $$ = make_type_singleton($1); }
+	| types { $$ = make_type_singleton(make_tuple_type($1)); }
+	| union_list_opt '|'
+	  { $$ = make_type_list ($1, make_tuple_type(nullptr)); }
+	| union_list_opt '|' type { $$ = make_type_list($1,$3); }
+	| union_list_opt '|' types
+	  { $$ = make_type_list($1,make_tuple_type($3)); }
 ;
 
 types	: type ',' type
@@ -584,9 +591,6 @@ types	: type ',' type
 	| types ',' type { $$=make_type_list($1,$3); }
 ;
 
-types_opt : /* empty */ { $$=nullptr; }
-	| types
-;
 
 commalist_opt: /* empty */	 { $$=raw_expr_list(nullptr); }
 	| commalist
