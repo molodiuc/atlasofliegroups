@@ -13,6 +13,7 @@
 #include "ext_block.h"
 #include "../Atlas.h"
 #include "polynomials.h"
+#include "kl.h"
 
 namespace atlas {
 
@@ -74,9 +75,14 @@ class KL_table
 
   std::vector<kl::KLRow> column; // columns are lists of polynomial pointers
 
+  //TEMPORARY
+  kl::KLContext untwisted;
+  
  public:
+
    KL_table(const ext_block::ext_block& b, std::vector<Pol>& pool)
-    : aux(b), storage_pool(pool), column() {}
+     : aux(b), storage_pool(pool), column() , untwisted(b.untwisted())
+    {untwisted.fill(false);}
 
   size_t rank() const { return aux.block.rank(); }
   size_t size() const { return column.size(); }
@@ -118,6 +124,8 @@ class KL_table
 
   void do_new_recursion(BlockElt y,PolHash& hash);
 
+  bool check_polys(BlockElt y) const;
+  
 }; // |KL_table|
 
 } // |namespace ext_kl|

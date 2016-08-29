@@ -880,10 +880,32 @@ void exam_f()
 
 void test_f() // trial of twisted KLV computation
 {
+  /*
+  ensure_full_block();
+  WeightInvolution delta = interactive::get_commuting_involution
+    (commands::current_layout(), commands::current_lattice_basis());
 
+  auto& block = current_param_block();
+  if (not ((delta-1)*block.gamma().numerator()).isZero())
+  {
+    std::cout << "Chosen delta does not fix gamma=" << block.gamma()
+	      << " for the current block." << std::endl;
+    return;
+  }
+  ext_block::ext_block eblock(current_inner_class(),block,
+			      currentRealGroup().kgb(),delta);
+  if (check(eblock,block,true))
+  {
+    std::cout << "Extended block structure checked successfully." << std::endl;
+    //  ioutils::OutputFile file;
+    //  eblock.print_to(file);
+  }
+  else
+    std::cout << "Extended block structure check failed." << std::endl;
+  */
   ext_block::ext_block
     eblock(commands::current_inner_class(),
-	   commands::currentBlock(),
+ 	   commands::currentBlock(),
 	   commands::currentRealGroup().kgb(),
 	   commands::currentDualRealGroup().kgb(),
 	   commands::current_inner_class().distinguished()
@@ -900,13 +922,22 @@ void test_f() // trial of twisted KLV computation
   ext_kl::KL_table twisted_KLV(eblock,pool);
   twisted_KLV.fill_columns(last);
 
+  const kl::KLContext& klc = atlas::commands::currentKL();
+    
   ioutils::OutputFile f;
   for (BlockElt y=0; y<last; ++y)
     for (BlockElt x=y+1; x-->0; )
-      if (not twisted_KLV.P(x,y).isZero())
+      if (not klc.klPol(eblock.z(x),eblock.z(y)).isZero())
+      //    if (not twisted_KLV.P(x,y).isZero())
       {
-	f << "P(" << eblock.z(x) << ',' << eblock.z(y) << ")=";
-	f << twisted_KLV.P(x,y) << std::endl;
+	BlockElt z2=eblock.z(y);
+	BlockElt z1=eblock.z(x);
+	f <<  "  P(" << z1 << ',' << z2 << ")=";
+	f << klc.klPol(z1,z2) << std::endl;
+	f <<  "Ptw(" << z1 << ',' << z2 << ")="; 
+	f << twisted_KLV.P(x,y) << std::endl << std::endl;
+	// f << "P(" << eblock.z(x) << ',' << eblock.z(y) << ")=";
+	// f << twisted_KLV.P(x,y) << std::endl;
       }
 
 }

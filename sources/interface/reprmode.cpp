@@ -33,6 +33,7 @@
 #include "kgb_io.h"
 #include "blocks.h"
 #include "ext_block.h"
+#include "ext_kl.h"
 #include "subsystem.h"
 #include "repr.h"
 #include "block_io.h"
@@ -71,6 +72,7 @@ namespace commands {
   void kllist_f();
   void primkl_f();
   void klwrite_f();
+  void extkl_f();
   void wgraph_f();
   void wcells_f();
 
@@ -115,6 +117,7 @@ CommandNode reprNode()
   result.add("kllist",kllist_f,"second");
   result.add("primkl",primkl_f,"second");
   result.add("klwrite",klwrite_f,"second");
+  result.add("extkl",extkl_f,"second");
   result.add("wcells",wcells_f,"second");
   result.add("wgraph",wgraph_f,"second");
 
@@ -416,6 +419,55 @@ void deform_f()
 
    This is what is required to write down the K-L basis element $c_y$.
 */
+
+void extkl_f()
+{
+  ensure_full_block();
+  WeightInvolution delta = interactive::get_commuting_involution
+    (commands::current_layout(), commands::current_lattice_basis());
+
+  auto& block = current_param_block();
+  if (not ((delta-1)*block.gamma().numerator()).isZero())
+  {
+    std::cout << "Chosen delta does not fix gamma=" << block.gamma()
+	      << " for the current block." << std::endl;
+    return;
+  }
+  
+  ext_block::ext_block eblock(current_inner_class(),block,
+			      currentRealGroup().kgb(),delta);
+    
+  ioutils::OutputFile f;
+  f << "Full list of non-zero twisted Kazhdan-Lusztig-Vogan polynomials:"
+       << std::endl << std::endl;
+
+  BlockElt last; input::InputBuffer& cl= commands::currentLine();
+  cl >> last; // maybe get threshold for filling
+  if (cl.fail())
+    last=eblock.size();
+  else // convert to block number
+    last=eblock.element(last);
+
+  const kl::KLContext& klc = block.klc(last,false); // currentKL();
+
+  std::vector<ext_kl::Pol> pool;
+  ext_kl::KL_table twisted_KLV(eblock,pool);
+  twisted_KLV.fill_columns(last);
+
+  for (BlockElt y=0; y<last; ++y)
+    for (BlockElt x=y+1; x-->0; )
+      if (not klc.klPol(eblock.z(x),eblock.z(y)).isZero())
+	// if (not twisted_KLV.P(x,y).isZero())
+      {
+	BlockElt z2=eblock.z(y);
+	BlockElt z1=eblock.z(x);
+       	f <<  "  P(" << z1 << ',' << z2 << ")=";
+       	f << klc.klPol(z1,z2) << std::endl;
+	f <<  "Ptw(" << z1 << ',' << z2 << ")="; 
+	f << twisted_KLV.P(x,y) << std::endl << std::endl;
+      }
+}// |extkl_f|
+
 void klbasis_f()
 {
   const kl::KLContext& klc = currentKL();
