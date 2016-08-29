@@ -114,7 +114,7 @@ class KL_table
 
   // look for a direct recursion and return whether possible;
   // if possible also get contributions from $c_s*a_y$ into |out|
-  bool direct_recursion(BlockElt y,weyl::Generator& s, BlockElt& sy) const;
+  bool has_direct_recursion(BlockElt y,weyl::Generator& s, BlockElt& sy) const;
 
   void do_new_recursion(BlockElt y,PolHash& hash);
 
