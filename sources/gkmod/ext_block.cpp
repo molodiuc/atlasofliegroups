@@ -1719,6 +1719,7 @@ void ext_block::complete_construction(const BitMap& fixed_points)
   {
     BlockElt z=parent_nr[n];
     info.push_back(elt_info(z));
+    info.back().length = parent.length(z);
     for (weyl::Generator oi=0; oi<orbits.size(); ++oi) // |oi|: orbit index
     {
       const weyl::Generator s = orbits[oi].s0, t=orbits[oi].s1;
@@ -1728,14 +1729,6 @@ void ext_block::complete_construction(const BitMap& fixed_points)
 
       if (link==UndefBlock)
 	continue; // done with |s| for imaginary compact, real nonparity cases
-
-      if (is_descent(type)) // then set or check length from predecessor
-      {
-	if (info.back().length==0)
-	  info.back().length=info[child_nr[link]].length+1;
-	else
-	  assert(info.back().length==info[child_nr[link]].length+1);
-      }
 
       // now maybe set |second|, depending on case
       switch (type)
