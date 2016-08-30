@@ -441,14 +441,14 @@ void extkl_f()
   f << "Full list of non-zero twisted Kazhdan-Lusztig-Vogan polynomials:"
        << std::endl << std::endl;
 
-  BlockElt last; input::InputBuffer& cl= commands::currentLine();
-  cl >> last; // maybe get threshold for filling
-  if (cl.fail())
-    last=eblock.size();
-  else // convert to block number
-    last=eblock.element(last);
+  // BlockElt last; input::InputBuffer& cl= commands::currentLine();
+  // cl >> last; // maybe get threshold for filling
+  // if (cl.fail())
+ BlockElt last=eblock.size();
+  // else // convert to block number
+  //  last=eblock.element(last);
 
-  const kl::KLContext& klc = block.klc(last,false); // currentKL();
+ const kl::KLContext& klc = block.klc(block.size()-1,false); // currentKL();
 
   std::vector<ext_kl::Pol> pool;
   ext_kl::KL_table twisted_KLV(eblock,pool);
