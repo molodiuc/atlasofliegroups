@@ -3,16 +3,8 @@
 <synthetic.at { for type KGBElt_gen }
 <Vogan-dual.at { for y_alt@(Param,InnerClass) }
 <polynomial.at { type poly, update_matrix_entry@(poly_mat,int,int,poly) }
-<extended.at { for type extended_param }
-
-{ recover required length_diff function, now only remaining in old_kl.at }
-set length (int i, vec stops) = int: { compute length=max{k:stops[k]<=i} }
-( let a=0, b=#stops { use binary search; invariant: a <= length < b } in
-  while a+1<b { when b=a+1, a is our max }
-  do let avg=(a+b)\2 in if stops[avg]<=i then a:=avg else b:=avg fi od
-; a
-)
-set length_diff (int i,int j,vec stops) = int: length(j,stops)-length(i,stops)
+<extended.at { for type ExtParam }
+<KL_polynomial_matrices.at
 
 {some similar stuff to Vogan-dual.at, also some extra functionality}
 
@@ -23,8 +15,7 @@ set length_diff (int i,int j,vec stops) = int: length(j,stops)-length(i,stops)
    i^th entry gives index of B1[i] in B2
    B1[i]=B2[perm[i]]
 }
-set permutation ([Param] B1, [Param] B2) = [int]:
-  for i:#B2 do find(B2,B1[i]) od
+set permutation ([Param] B1, [Param] B2) = [int]:for i:#B2 do find(B2,B1[i]) od
 
 { various functions for constructing dual block:
   dual(B), dual(B,g), dual(B,g,dual_inner_class), dual(B,dual_inner_class)
@@ -46,8 +37,8 @@ set dual_block ([Param] B, InnerClass dual_inner_class) = ([Param],[int]):
 {don't specify the inner class and/or the dual infinitesimal character}
 set dual_block ([Param] B) = ([Param],[int]):dual_block(B,dual_inner_class(B[0]))
 
-set dual_extended_parameter ( extended_param
-    (ic,delta,gamma,lambda,theta,g,l,omega,tau,t)) = extended_param:
+set dual_ExtParameter ( ExtParam
+    (ic,delta,gamma,lambda,theta,g,l,omega,tau,t)) = ExtParam:
     (dual(ic),^delta,g,l,omega,gamma,lambda,theta,t,tau)
 
 { matrix of P-polynomials for B, with signs if second argument is true
@@ -55,35 +46,8 @@ set dual_extended_parameter ( extended_param
   in the same order, so perm_B_block is the identity. In particular this
   should hold if B was constructed using block_of().
   Otherwise perm_B_block might be nontrivial
+  In the singular case the matrix is of size #survivors
 }
-set KL_block_polynomials ([Param] B,bool signs)=
-( let (block,n,Pmatrix,polynomials,stops,survivors,)=KL_block(B[0]) in
-  let m=n_rows(Pmatrix) in
-  let P=zero_poly_matrix(m) in
-  for i:m do
-    for j:m do
-      let length_diff = if signs then length_diff(i,j,stops) else 0 fi in
-      P:=update_matrix_entry(P,i,j,
-        convolve(sgn_poly((-1)^length_diff),polynomials[Pmatrix[i,j]]))
-    od
-  od
-; let perm_B_block=permutation(B,block) in
-  poly_permute_basis(perm_B_block,P)
-)
-
-{ define the P,P_signed and Q polynomials
-  P,P_signed,Q matrices of polynomials in q
-  upper triangular if B is in standard (increasing) order
-  P_signed: positive/negative integer coefficients
-  P: non-negative integer coefficients
-  Q: non-negative integer coefficients, inverse of P_signed
-  P_signed(1) is the multiplicity of a standard module in an irreducible
-    (character formula)
-  Q(1) is the multiplicity of an irreducible module in a standard module
-}
-set KL_P_polynomials ([Param] B) = KL_block_polynomials(B,false)
-set KL_P_signed_polynomials ([Param] B) = KL_block_polynomials(B,true)
-
 { The Q polynomials are obtained from KL_P_signed_polynomials(dual block)
   after applying a permutation and transpose
   should satisfy P_signed*Q=I
@@ -93,7 +57,7 @@ set KL_P_signed_polynomials ([Param] B) = KL_block_polynomials(B,true)
 }
 set KL_Q_polynomials ([Param] B)=
   let (B_vee,perm)=dual_block(B) in
-  let Q_0=KL_block_polynomials(B_vee,false) in  { Q_0 is upper triangular }
+  let Q_0=KL_P_polynomials(B_vee) in  { Q_0 is upper triangular }
   let Q_1=poly_permute_basis(perm,Q_0) in  { Q_1 (usually) lower triangular }
   transpose(Q_1) { (usually) upper triangular }
 
