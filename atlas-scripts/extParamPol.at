@@ -92,7 +92,7 @@ set deform_old (Param p, mat delta, int type) = ExtParamPol:
   let G=real_form(p) in
   if type=-2 then null_ext_module(G) else let
   N=null_module(G) then
-  (B,index_p)=block(p) then
+  (B,index_p)=singular_block(p) then
   complete_indices=complete_indices(B,delta) then
   sign_p=type then
   index_p=find(complete_indices,(index_p,sign_p)) then
@@ -209,18 +209,18 @@ for i:#complete_indices do
  let f=P[i][index] in
   if #f>0 then prints(complete_indices[i], ": ", stringPoly(f,"q")) fi od
 
-set print_extended_character_formula(Param p,mat delta)=void:print_extended_character_formula(p,block_of(p),delta)
+set print_extended_character_formula(Param p,mat delta)=void:print_extended_character_formula(p,singular_block_of(p),delta)
 
 
 set print_extended_composition_series(Param p,[Param] B,mat delta)=void:
-let index=find(B,p) then
-(I_delta,g,complete_indices,delta_action)=tabulate_indices(B,delta) then
+let (I_delta,g,complete_indices,delta_action)=tabulate_indices(B,delta) then
+index=find(complete_indices,(find(B,p),1)) then
 Q=big_KL_Q_polynomials(B,delta) in
 for i:#complete_indices do
  let f=Q[i][index] in
   if #f>0 then prints(complete_indices[i], ": ", stringPoly(f,"q")) fi od
 
-set print_extended_composition_series(Param p,mat delta)=void:print_extended_composition_series(p,block_of(p),delta)
+set print_extended_composition_series(Param p,mat delta)=void:print_extended_composition_series(p,singular_block_of(p),delta)
 
 set print_extended_indices([Param] B,mat delta)=void:
 let (I_delta,g,complete_indices,delta_action)=tabulate_indices(B,delta) in
