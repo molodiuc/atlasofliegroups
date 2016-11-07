@@ -45,8 +45,9 @@ multiplicity of J' in F^{2+2k} is a_{0}  [note: 2+2k=l(I)-l(J')]
 set graded_multiplicities([Param] B,poly_mat Q,Param irr, Param std)=vec:
 if irr=std then [1] else
 let f=KL_Q_polynomial(B,Q,irr,std) then
-d=length(std)-length(irr) then
-v=null(d+1) in for i:#f do v[d-2*i]:=f[i] od; v  fi
+d=length(std)-length(irr) in
+if d<0 then [] else 
+let v=null(d+1) in for i:#f do v[d-2*i]:=f[i] od; v  fi fi
 
 set graded_multiplicities([Param] B,Param irr, Param std)=vec:graded_multiplicities(B,KL_Q_polynomials(B),irr,std)
 set graded_multiplicities(Param irr, Param std)=vec:graded_multiplicities(block_of(irr),irr,std)
