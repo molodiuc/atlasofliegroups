@@ -49,7 +49,7 @@ d=length(std)-length(irr) then
 v=null(d+1) in for i:#f do v[d-2*i]:=f[i] od; v  fi
 
 set graded_multiplicities([Param] B,Param irr, Param std)=vec:graded_multiplicities(B,KL_Q_polynomials(B),irr,std)
-set graded_multiplicities(Param irr, Param std)=vec:graded_multiplicities(singular_block_of(irr),irr,std)
+set graded_multiplicities(Param irr, Param std)=vec:graded_multiplicities(block_of(irr),irr,std)
 
 set graded_composition_series([Param] B,poly_mat Q,Param std)=[(Param,vec)]:
 let rv=[] in
@@ -61,7 +61,7 @@ if sum(f) >0 then
 rv#:=(irr,f) fi od ;rv
 
 set graded_composition_series([Param] B,Param std)=[(Param,vec)]:graded_composition_series(B,KL_Q_polynomials(B),std)
-set graded_composition_series(Param std)=[(Param,vec)]:graded_composition_series(singular_block_of(std),std)
+set graded_composition_series(Param std)=[(Param,vec)]:graded_composition_series(block_of(std),std)
 
 set print_graded_composition_series(Param std)=void:
 let B={singular_}block_of(std) then

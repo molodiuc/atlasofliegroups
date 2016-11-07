@@ -73,9 +73,7 @@ set deform_unreduced (Param p, mat delta, int sign) = ExtParamPol:
     od
         ;null_ext_module(real_form(p))+
         for f@i in solution
-    do  
-        let (ordinary_index_q,epsilon_q)=complete_indices[i] then 
-	q=B[ordinary_index_q] then
+    do  let (ordinary_index_q,epsilon_q)=complete_indices[i] then q=B[ordinary_index_q] then
         onr=(-1)^rat_as_int((on_p-orientation_nr(q))/2) then
         term=(1-s)*onr*f*B[ordinary_index_q] in
          if epsilon_q=1 then (term,N,N)
@@ -87,8 +85,7 @@ fi
 )
 
 set deform(Param p,mat delta, int type)=ExtParamPol:deform_unreduced(p,delta,type)
-{let (plus,minus,induced)=
-deform_unreduced(p,delta,type) in (plus+s*minus,null_module(real_form(p)),induced)}
+{let (plus,minus,induced)=deform_unreduced(p,delta,type) in (plus+s*minus,null_module(real_form(p)),induced)}
 
 set deform_old (Param p, mat delta, int type) = ExtParamPol:
 (
