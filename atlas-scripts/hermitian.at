@@ -226,16 +226,18 @@ for alpha in real_roots do
 set mu(Param p,mat delta)=rat:
 assert(nu(p)=null(rank(root_datum(p))),"nu(p) !=0");
 let (ic,delta,gamma,lambda,theta,g,l,omega,tau,t)=E(delta,p) then
-mu_unextended=mu(p) then
-tau_term=(tau*(^delta-1)*l)/4 then
+lambda_rho_term=lambda*(g-l) then
+tau_term=(tau*(^delta-1)*l)/2 then
 dim_term=dim_u_cap_p(x(p)) then
-scalar_term=number_real_orthogonal_pairs(x(p),delta)  in
-prints("mu_unextended=", mu_unextended,new_line,"tau_term=",tau_term,new_line
-      ,"dim_term=", dim_term,new_line,"scalar_term=",scalar_term);
- mu_unextended+tau_term+scalar_term+dim_term
+scalar_term=number_real_orthogonal_pairs(x(p),delta)  then
+new_term=2*rho_r(x(p))*(g-l) in
+{prints("lambda_rho_term:", lambda_rho_term,new_line,"tau_term=",tau_term,new_line
+      ,"dim_term=", dim_term,new_line,"scalar_term=",scalar_term, new_line,"new_term:", new_term);}
+lambda_rho_term+ tau_term+dim_term+scalar_term+new_term
 
 {remaining terms copied over from corresponding versions in hermitian.at}
 set convert_cform_hermitian (ParamPol P,mat delta)= ParamPol:
+  let ()=for c@p in P do  print_mu(c,p,delta) od in 
   if #P=0 then P { since we cannot select a term for a null polynomial }
   else
     let a_mu = mu(first_param(P),delta)
@@ -251,6 +253,28 @@ if is_equal_rank(real_form(p)) then
    convert_cform_hermitian(c_form_irreducible(p))
 else
    convert_cform_hermitian(c_form_irreducible_twisted(p),real_form(p).distinguished_involution) fi
+
+{ ParamPol giving the hermitian form on irreducible p in all cases}
+set hermitian_form_irreducible_debug(Param p) = ParamPol:
+if is_equal_rank(real_form(p)) then
+   convert_cform_hermitian(c_form_irreducible(p))
+else
+   let cf=c_form_irreducible_twisted(p,real_form(p).distinguished_involution)  then
+   mu_0=mu(first_param(cf)) in
+   let ()=prints("mu_0=", mu_0) in 
+   for c@p in cf do 
+let (ic,delta,gamma,lambda,theta,g,l,omega,tau,t)=E(delta,p) then
+lambda_rho_term=lambda*(g-l) then
+tau_term=(tau*(^delta-1)*l)/2 then
+dim_term=dim_u_cap_p(x(p)) then
+scalar_term=number_real_orthogonal_pairs(x(p),delta)  then
+new_term=2*rho_r(x(p))*(g-l) then 
+mu=lambda_rho_term+tau_term+dim_term+scalar_term+new_term in
+prints(p, "    ", c , "     ", "  ", lambda_rho_term, "  ", tau_term, "     ", dim_term, "     ", scalar_term, "     ", new_term, "   ", mu, "  ", c*s^(rat_as_int(mu-mu_0))) od
+;convert_cform_hermitian(cf) fi
+
+
+
 
 { nice output of hermitian_form_irreducible }
 set print_hermitian_form_irreducible(Param p,mat delta) = void:
