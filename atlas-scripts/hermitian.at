@@ -71,6 +71,24 @@ set c_form_irreducible_long (Param p) = (ParamPol,[(Param,Split,ParamPol)]):
   in this sum by 1 or s; which of the two is to be determined later)
 }
 
+set c_form_irr_as_sum_of_standards(Param p, mat delta)=ParamPol:
+( let G=p.real_form then
+  ori_nr_p = orientation_nr(p) then
+  rv=null_module(G) then
+  Ptw=twisted_KL_sum_at_s(p) then
+  P=KL_sum_at_s(p) in
+  for ev@q in P
+  do
+    if is_fixed(delta,q) then
+     let new_ev=divide_by((P[q]+Ptw[q])+s*(P[q]-Ptw[q]),2)  then
+         c=new_ev*orientation_nr_term(ori_nr_p,q) in rv +:= c*q
+    else
+         let c=ev*orientation_nr_term(ori_nr_p,q) in rv +:= c*q
+    fi
+  od
+; rv
+)
+
 { basic version of c_form_irreducible_twisted, for any delta }
 set c_form_irreducible_twisted(Param p,mat delta) = ParamPol:
 ( let G=p.real_form then
@@ -130,19 +148,14 @@ set c_form_irreducible_delta_long (Param p) =(ParamPol,[(string,Split,Param,Para
 c_form_irreducible_twisted_long(p)
 
 {print versions}
-set print_c_form_irreducible_twisted_long (Param p) =void:
-let (character_formula,terms,answer)=c_form_irreducible_twisted_long(p) then
-()=prints(new_line,"Character Formula:",character_formula,new_line) then
-()=for (type,coeff,p,P) in terms do prints("coeff*standard module:", coeff,"*",p,":",new_line,"fully deformed (", type, "):", P, new_line) od then
-()=prints("final result:", answer) in ()
-
 set print_c_form_irreducible_twisted_long (Param p) = void:
-( let (,b,f) = c_form_irreducible_twisted_long(p) in
-  for (q,coeff,,Q) in b
+( let formula=c_form_irr_as_sum_of_standards(p,delta) then
+  ()=prints(new_line,new_line,"Form on irreducible in terms of standards:", formula) then
+  (,b,f) = c_form_irreducible_twisted_long(p) in		  
+  for (type,coeff,q,Q) in b
   do prints("")
   ; prints("standard module: ",q)
-  ; prints("coefficient: ",split_format(coeff))
-  ; prints("form on standard: ")
+  ; prints("coeff*form on standard: ")
   ; pol_format(Q)
   od
 ; prints(""); prints("c-form on irreducible module:")

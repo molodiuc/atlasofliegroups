@@ -287,13 +287,13 @@ set c_form_irreducible_big_long (Param p,mat delta, int type) =
 )
 
 set print_c_form_irreducible_big_long(ExtParamPol cf, [((Split,Param),ExtParamPol)] plus,[((Split,Param),ExtParamPol)] minus,[((Split,Param),ExtParamPol)] induced,ExtParamPol answer)=void:
-let ()=prints(new_line,new_line,"Character Formula:");
+let ()=prints(new_line,new_line,"Form on irreducible in terms of standards:");
 display(cf) then
-()=prints(new_line,"plus parts of character formula:") in
+()=prints(new_line,"plus parts of formula for c-form:") in
 for ((w,a),b) in plus do prints(new_line,"Standard Module: ", w,"*",a, new_line, "fully deformed:");display(b) od;
-prints(new_line,"minus parts of character formula:");
+prints(new_line,"minus parts of formula for c-form:");
 for ((w,a),b) in minus do prints(new_line,"Standard Module: ", w,"*",a, new_line, "fully deformed:");display(b) od;
-prints(new_line,"induced parts of character formula:");
+prints(new_line,"induced parts of formula for c-form:");
 for ((w,a),b) in induced do prints(new_line, "Standard Module: ", w,"*",a, new_line, "fully deformed:");display(b) od;
 prints(new_line, "Answer:");display(answer);
 let (plus,minus,ind)=answer in prints("modified answer:", plus+s*minus);()
