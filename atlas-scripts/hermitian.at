@@ -149,7 +149,7 @@ c_form_irreducible_twisted_long(p)
 
 {print versions}
 set print_c_form_irreducible_twisted_long (Param p) = void:
-( let formula=c_form_irr_as_sum_of_standards(p,delta) then
+( let formula=c_form_irr_as_sum_of_standards(p,real_form(p).distinguished_involution) then
   ()=prints(new_line,new_line,"Form on irreducible in terms of standards:", formula) then
   (,b,f) = c_form_irreducible_twisted_long(p) in		  
   for (type,coeff,q,Q) in b
