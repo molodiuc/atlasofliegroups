@@ -237,7 +237,6 @@ lambda_rho_term+ tau_term+dim_term+scalar_term+new_term
 
 {remaining terms copied over from corresponding versions in hermitian.at}
 set convert_cform_hermitian (ParamPol P,mat delta)= ParamPol:
-  let ()=for c@p in P do  print_mu(c,p,delta) od in 
   if #P=0 then P { since we cannot select a term for a null polynomial }
   else
     let a_mu = mu(first_param(P),delta)
@@ -263,7 +262,7 @@ else
    mu_0=mu(first_param(cf)) in
    let ()=prints("mu_0=", mu_0) in 
    for c@p in cf do 
-let (ic,delta,gamma,lambda,theta,g,l,omega,tau,t)=E(delta,p) then
+let (ic,delta,gamma,lambda,theta,g,l,omega,tau,t)=E(real_form(p).distinguished_involution,p) then
 lambda_rho_term=lambda*(g-l) then
 tau_term=(tau*(^delta-1)*l)/2 then
 dim_term=dim_u_cap_p(x(p)) then
