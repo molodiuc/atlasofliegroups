@@ -105,7 +105,7 @@ set c_form_irr_twisted_as_sum_of_standards(Param p, mat delta)=ParamPol:
   for ev@q in P
   do
     if is_fixed(delta,q) then
-     let new_ev=divide_by((P[q]+Ptw[q])+s*(P[q]-Ptw[q]),2)  then
+     let new_ev=half((P[q]+Ptw[q])+s*(P[q]-Ptw[q]))  then
          c=new_ev*orientation_nr_term(ori_nr_p,q) in rv +:= c*q
     else
          let c=ev*orientation_nr_term(ori_nr_p,q) in rv +:= c*q
