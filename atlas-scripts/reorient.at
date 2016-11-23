@@ -9,23 +9,23 @@ theta = involution(p), grading_vector = lambda(p) - rho_r(x(p)) in
 let count = 0/2
 in for av@i in poscoroots(rd) do  {av is a coroot}
 let a=posroots(rd)[i] in          {a is corresponding root}
-if (is_real(a,x) and is_integer(av*gamma) and   not(parity(p,a)))
-then count :=count + 1 fi;
+{if (is_real(a,x) and is_integer(av*gamma) and   not(parity(p,av)))
+then count :=count + 1 fi;}
 if (is_real(a,x) and not (is_integer(av*gamma))) then
-if ( (((av*grading_vector) % 2) = 0) and ((av*gamma +3)%4 <2) )
+if ( (((av*grading_vector) % 2) = 0) and ((av*gamma)%2 > 1) )
 then count  := count + 1  fi;
-if ( (((av*grading_vector) % 2) = 1) and ((av*gamma)%4 >2) )
+if ( (((av*grading_vector) % 2) = 1) and ((av*gamma)%2 < 1) )
 then count  := count + 1  fi
 fi; {real nonint}
-if (is_complex(a,x) and not(is_integer(av*gamma)) and (av*gamma > 0)
-and (av*theta*gamma < 0)) then count := count + (1/2) fi
+if (is_complex(a,x) and not(is_integer(av*gamma)) and
+((av*gamma)*(av*theta*gamma) < 0)) then count := count + (1/2) fi
 od; rat_as_int(count)
 
 set orientation_nr_term_new = (int,Param->Split):
   let err()=
-    error("computing orientation number for odd difference of lengths")
+    error("odd difference of orientation numbers")
   in (int ori_nr_p,Param q) Split:
-  case (ori_nr_p-orientation_nr_new(q))%4 in 1, err(), s, err() esac
+  case (abs(ori_nr_p-orientation_nr_new(q)))%4 in 1, err(), s, err() esac
 
 set orientation_nr(Param p)=int:if use_new_orientation_nr then orientation_nr_new(p) else orientation_nr_orig(p) fi
 set orientation_nr_term(int k, Param p)=Split:if use_new_orientation_nr then orientation_nr_term_new(k,p) else orientation_nr_term_orig(k,p) fi
