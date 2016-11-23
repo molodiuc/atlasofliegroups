@@ -1,5 +1,6 @@
 <extended.at
 <polynomial.at
+<reorient.at
 
 set KL_block (Param p, mat delta) = { emulate built-in |KL_block| }
     ([Param],int,mat,[vec],vec,vec,mat):
