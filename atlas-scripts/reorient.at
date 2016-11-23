@@ -1,0 +1,33 @@
+set use_new_orientation_nr=true
+
+set orientation_nr_orig(Param p) = int:orientation_nr(p)
+set orientation_nr_term_orig(int k, Param p)=Split:orientation_nr_term(k,p)
+
+set orientation_nr_new(Param p) = int :
+let rd = root_datum(p), gamma = infinitesimal_character(p), x=x(p),
+theta = involution(p), grading_vector = lambda(p) - rho_r(x(p))
+in
+let count = 0/2
+in for av in poscoroots(rd) do
+if (is_real(av,x) and is_integer(av*gamma)) then if  not(parity(p,av ))
+then count :=count + 1 fi fi;
+if (is_real(av,x) and not (is_integer(av*gamma))) then
+if ( (((av*grading_vector) % 2) = 0) and ((av*gamma +3)%4 <2) )
+then count  := count + 1  fi;
+if ( (((av*grading_vector) % 2) = 1) and ((av*gamma)%4 >2) )
+then count  := count + 1  fi
+fi; {real nonint}
+if (is_complex(av,x) and not(is_integer(av*gamma)) and (av*gamma > 0)
+and (av*theta*gamma < 0)) then count := count + (1/2) fi
+od; rat_as_int(count)
+
+set orientation_nr_term_new = (int,Param->Split):
+  let err()=
+    error("computing orientation number for odd difference of lengths")
+  in (int ori_nr_p,Param q) Split:
+  case (ori_nr_p-orientation_nr_new(q))%4 in 1, err(), s, err() esac
+
+set orientation_nr(Param p)=int:if use_new_orientation_nr then orientation_nr_new(p) else orientation_nr_orig(p) fi
+set orientation_nr_term(int k, Param p)=Split:if use_new_orientation_nr then orientation_nr_term_new(k,p) else orientation_nr_term_orig(k,p) fi
+
+{for p in block_of(trivial(Sp(4,R))) do prints("old = ", orientation_nr(p*(1/2)),"   new = ", reorient(p*(1/2))) od}
